@@ -1,0 +1,47 @@
+<!doctype HTML>
+<html lang="en">
+
+    <head>
+        <link href="css/login.css" rel="stylesheet" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <title>SynBis Interface</title>
+        <script>
+            function setCookie() {
+
+                var user_details = [];
+                user_details[0] = document.getElementById("username").value;
+                user_details[1] = document.getElementById("surname").value;
+                user_details[2] = document.getElementById("login").value;
+                user_details[3] = document.getElementById("role").value;
+                localStorage.setItem("user_credentials", user_details);
+            }
+            ;
+
+
+
+        </script>
+
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>Welcome to SynBIS</h1>
+            <h2>Enter College Login details to proceed</h2>
+        </div>
+        <div class="login-block">
+
+            <h1>Login</h1>
+            <input type="text" placeholder="First Name" id="username" />
+            <input type="text"  placeholder="Last Name" id="surname" />
+            <input type="text" placeholder="Login" id="login" />
+            <input type="text" placeholder="Role" id="role" />
+            <a href="template.html" onclick="setCookie();"> <button>Submit</button></a>
+        </div>
+
+        <div class="footer">
+            <img src="images/imperial.jpg" alt="imperial logo" width="140" height="60" />
+        </div>
+
+    </body>
+
+</html>

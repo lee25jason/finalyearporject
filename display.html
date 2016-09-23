@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <link href="./css/login.css" rel="stylesheet" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <title>SynBis Interface</title>
+
+        <script>
+            $(document).ready(function () {
+                var user = localStorage.getItem("user_credentials").split(",");
+                var well_metadata = localStorage.getItem("metadata_info").split(",");
+                var metadata_header = localStorage.getItem("metadata_header").split(",");
+                var metadata_value = localStorage.getItem("metadata_value").split(",");
+                var metadata_header_change = localStorage.getItem("metadata_header_change").split(",");
+
+                $("#user-name").html(user[0] + user[1]);
+                $("#user-login").html(user[2]);
+                $("#user-role").html(user[3]);
+
+
+                //Generate the table
+
+                var output = "";
+
+                for (var i = 1; i <= 8; i++) {
+                    for (var j = 1; j <= 12; j++) {
+                        if (i == 1) {
+                            k = "A";
+                        } else if (i == 2) {
+                            k = "B";
+                        } else if (i == 3) {
+                            k = "C";
+                        } else if (i == 4) {
+                            k = "D";
+                        } else if (i == 5) {
+                            k = "E";
+                        } else if (i == 6) {
+                            k = "F";
+                        } else if (i == 7) {
+                            k = "G";
+                        } else if (i == 8) {
+                            k = "H";
+                        }
+                        var heading = '<td>' + k + j + '</td>';
+                        output = output.concat(heading);
+
+                    }
+                }
+
+                $('#myTable').append('<tr class="table_header">' + '<td></td>' + output + '</tr>');
+
+
+                var output = "";
+
+
+                for (var i = 0; i < well_metadata.length; i++) {
+                    var metadata = '<td>' + well_metadata[i] + '</td>';
+                    output = output.concat(metadata);
+                }
+
+                $('#myTable').append('<tr>' + '<td>' +metadata_header_change+'</td>' + output + '</tr>');
+
+                var output = "";
+
+
+                for (var i = 0; i < metadata_header.length; i++) {
+                    
+                    var header = '<td>' + metadata_header[i] + '</td>';
+                   var output=""; 
+                    var value= '<td>'+metadata_value[i]+'</td>';
+                   
+                    for (var j = 0; j < well_metadata.length; j++) {
+                        
+                        
+                        output=output.concat(value);
+                    }
+                    output=header+output;
+                    $('#myTable').append('<tr>'+output+ '</tr>');
+                }
+
+
+
+                function exportTableToCSV($table, filename) {
+                    alert('function begins');
+                    var $rows = $table.find('tr:has(td)'),
+                            // Temporary delimiter characters unlikely to be typed by keyboard
+                            // This is to avoid accidentally splitting the actual contents
+                            tmpColDelim = String.fromCharCode(11), // vertical tab character
+                            tmpRowDelim = String.fromCharCode(0), // null character
+
+                            // actual delimiter characters for CSV format
+                            colDelim = '","',
+                            rowDelim = '"\r\n"',
+                            // Grab text from table into CSV formatted string
+                            csv = '"' + $rows.map(function (i, row) {
+                                var $row = $(row),
+                                        $cols = $row.find('td');
+
+                                return $cols.map(function (j, col) {
+                                    var $col = $(col),
+                                            text = $col.text();
+
+                                    return text.replace(/"/g, '""'); // escape double quotes
+
+                                }).get().join(tmpColDelim);
+
+                            }).get().join(tmpRowDelim)
+                            .split(tmpRowDelim).join(rowDelim)
+                            .split(tmpColDelim).join(colDelim) + '"',
+                            // Data URI
+                            csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+
+                    $(this)
+                            .attr({
+                                'download': filename,
+                                'href': csvData,
+                                'target': '_blank'
+                            });
+                }
+
+                // This must be a hyperlink
+                $(".export").on('click', function (event) {
+                    // CSV
+                    exportTableToCSV.apply(this, [$('#dvData>table'), 'export.csv']);
+
+                    // IF CSV, don't do event.preventDefault() or return false
+                    // We actually need this to be a typical hyperlink
+                })
+
+            });
+
+        </script>
+
+
+    </head>
+
+    <body>
+
+
+        <div class="header">
+            <h1>4. Summary</h1>
+
+        </div>
+
+        <div class="user-details">
+            <h4>User Details:</h4>
+            <table>
+                <tbody id="user">
+                    <tr>
+                        <td>Name:</td>
+                        <td id="user-name"><td>
+                    </tr>
+                    <tr>
+                        <td>Login:</td>
+                        <td id="user-login"></td>
+                    </tr>
+                    <tr>
+                        <td>Role:</td>
+                        <td id="user-role"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+
+        <div class="template-block">
+            <div id="dvData">
+                <table >
+                    <tbody id="myTable">
+                    </tbody>
+
+                </table>
+
+            </div>
+            <a href="template.html" class="export">Export Table data as .csv</a>
+        </div>
+
+
+
+
+    </body>
+
+
+</html>

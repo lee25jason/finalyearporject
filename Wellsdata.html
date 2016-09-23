@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <link href="./css/login.css" rel="stylesheet" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <title>SynBis Interface</title>
+
+        <script>
+            $(document).ready(function () {
+                var user = localStorage.getItem("user_credentials").split(",");
+
+                $("#user-name").html(user[0] + user[1]);
+                $("#user-login").html(user[2]);
+                $("#user-role").html(user[3]);
+
+                var x = [];
+
+                localStorage.setItem("col_num", x);
+                localStorage.setItem("row_num", x);
+
+
+                var well_metadata = [];
+
+                for (var i = 0; i < 96; i++) {
+
+                    well_metadata[i] = "NA";
+                }
+
+                localStorage.setItem("metadata_info", well_metadata);
+
+            });
+
+        </script>
+
+        <script>
+
+            function createplate()
+            {
+                x = new Array();
+                var row_index = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+                var column_index = [];
+                for (i = 1; i <= 12; i++) {
+                    column_index[i - 1] = i;
+                }
+
+                string = '';
+                for (var j = 1; j <= 8; j++) {
+                    string_row = '<div class="plate_row">';
+                    for (i = 1; i <= 12; i++)
+                    {
+
+                        string_row += '<div class="well" id="well_' + j + '_' + i + '" onclick="Well_ID(' + j + ',' + i + ')"><img src="./images/well.png" alt="Entrance"></div>';
+                    }
+                    string_row += '</div>';
+                    string += string_row;
+                }
+                $("#96_plate").html(string);
+
+
+                string = '';
+                for (var j = 0; j < 8; j++)
+                {
+                    string += '<div class="well_row">' + row_index[j] + '</div>';
+                }
+                $("#96_plate_row").html(string);
+
+                string = '<div class="rump"></div>';
+                for (var j = 0; j < 12; j++) {
+                    string += '<div class="well_column">' + column_index[j] + '</div>';
+                }
+
+                $("#96_plate_column").html(string);
+            }
+
+            function Well_ID(i, j) {
+
+//toggle class
+                $('#well_' + i + '_' + j).toggleClass('selected');
+
+//set cookies
+
+                var row_numbers_tempo = localStorage.getItem("row_num").split(",");
+                var column_numbers_tempo = localStorage.getItem("col_num").split(",");
+                var row_numbers = [];
+                var column_numbers = [];
+                var row_name = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+
+                for (var k = 0; k < row_numbers_tempo.length; k++) {
+                    if (column_numbers_tempo[k] !== "") {
+
+                        row_numbers.push(row_numbers_tempo[k]);
+                        column_numbers.push(column_numbers_tempo[k]);
+                    }
+                }
+                var match = 0;
+
+                for (var k = 0; k < row_numbers.length; k++) {
+                    if (column_numbers_tempo[k] == j && row_numbers_tempo[k] == i) {
+                        match = 1;
+                        index = k;
+                    }
+
+                }
+
+
+                if (match == 1) {
+                    column_numbers.splice(index, 1);
+                    row_numbers.splice(index, 1);
+                } else {
+                    column_numbers.push(j);
+                    row_numbers.push(i);
+                }
+
+
+                if (row_numbers == "") {
+                    $(".wrapper").hide();
+                } else {
+                    $(".wrapper").show();
+                }
+
+
+                localStorage.setItem("col_num", column_numbers);
+                localStorage.setItem("row_num", row_numbers);
+
+
+
+                var display_row = row_numbers;
+
+                for (k = 0; k < display_row.length; k++) {
+                    if (display_row[k] == 1) {
+                        display_row[k] = "A";
+                    } else if (display_row[k] == 2) {
+                        display_row[k] = "B";
+                    } else if (display_row[k] == 3) {
+                        display_row[k] = "C";
+                    } else if (display_row[k] == 4) {
+                        display_row[k] = "D";
+                    } else if (display_row[k] == 5) {
+                        display_row[k] = "E";
+                    } else if (display_row[k] == 6) {
+                        display_row[k] = "F";
+                    } else if (display_row[k] == 7) {
+                        display_row[k] = "G";
+                    } else if (display_row[k] == 8) {
+                        display_row[k] = "H";
+                    }
+
+                }
+
+
+
+
+                var well_coord = $.map(row_numbers, function (v, i) {
+                    return [v, column_numbers[i]];
+                });
+
+                $("#wells-chosen").html(well_coord);
+
+                //display metadata if already entered
+
+                var well_metadata = localStorage.getItem("metadata_info").split(",");
+
+                var m = 12 * (i - 1) + j - 1;
+
+                if (well_metadata[m] == "NA" || well_metadata[m] == "") {
+                    $('#display_metadata').html("No metadata entered yet");
+                } else {
+                    $('#display_metadata').html(well_metadata[m]);
+                }
+
+            }
+
+
+            function clear_plate() {
+                //Clears Plate Selection
+                for (k = 1; k <= 8; k++)
+                    for (l = 1; l <= 12; l++) {
+                        $('#well_' + k + '_' + l).removeClass('selected');
+                    }
+
+                var row_numbers = localStorage.getItem("row_num").split(",");
+                var column_numbers = localStorage.getItem("col_num").split(",");
+                row_numbers = "";
+                column_numbers = "";
+
+
+                localStorage.setItem("col_num", column_numbers);
+                localStorage.setItem("row_num", row_numbers);
+
+
+
+                var well_coord = $.map(row_numbers, function (v, i) {
+                    return [v, column_numbers[i]];
+                });
+
+                $("#wells-chosen").html(well_coord)
+
+                $(".wrapper").hide();
+            }
+
+
+            function setCookie() {
+
+                var row_numbers = localStorage.getItem("row_num").split(",");
+                var column_numbers = localStorage.getItem("col_num").split(",");
+                var well_metadata = localStorage.getItem("metadata_info").split(",");
+
+                var metadata_input = document.getElementById("input_metadata").value;
+
+                for (var k = 0; k < row_numbers.length; k++) {
+
+                    var m = 12 * (row_numbers[k] - 1) + (column_numbers[k] - 1);
+
+
+                    well_metadata[m] = metadata_input;
+
+
+                    if (metadata_input !== "") {
+                        $('#well_' + row_numbers[k] + '_' + column_numbers[k]).css({"border": " 1px solid #9EC9E9", "height": "43px", "width": "43px"});
+                    }
+
+
+
+                }
+
+                localStorage.setItem("metadata_info", well_metadata);
+
+
+            }
+
+
+            function delete_data() {
+                var row_numbers = localStorage.getItem("row_num").split(",");
+                var column_numbers = localStorage.getItem("col_num").split(",");
+                var well_metadata = localStorage.getItem("metadata_info").split(",");
+
+                for (var k = 0; k < row_numbers.length; k++) {
+
+                    var m = 12 * (row_numbers[k] - 1) + (column_numbers[k] - 1);
+
+                    well_metadata[m] = "NA";
+                    $('#well_' + row_numbers[k] + '_' + column_numbers[k]).css({"border": " 0px solid #9EC9E9", "height": "45px", "width": "45px"});
+                }
+                localStorage.setItem("metadata_info", well_metadata);
+            }
+
+        </script>
+
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>3. Wells Data</h1>
+            <h2> Click on the wells needed,  and input the respective metadata </h2>
+        </div>
+
+        <div class="user-details">
+            <h4>User Details:</h4>
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td id="user-name"><td>
+                </tr>
+                <tr>
+                    <td>Login:</td>
+                    <td id="user-login"></td>
+                </tr>
+                <tr>
+                    <td>Role:</td>
+                    <td id="user-role"></td>
+                </tr>
+            </table>
+
+        </div>
+
+
+
+        <div id="wells-block" class="template-block">
+
+
+            <div class="list_column" id="96_plate_column"></div>
+            <div class="list_row" id="96_plate_row"></div>
+
+
+            <div class="plate" id="96_plate"></div>
+
+            <div class="Instructions">
+                <h4>INSTRUCTIONS</h4>
+                <p>To SELECT wells: Click on the wells to select them. Metadata entered previously will be shown below.<br/><br/>
+                    To ENTER metadata: Once wells are selected, a text box will appear below to enter the corresponding metadata<br/><br/>
+                    - Wells with a Blue outline have metadata inputted in them
+
+            </div>
+
+            <div class="show_metadata">
+                <h5>Metadata Entered:</h5>
+                <p id="display_metadata"></p>
+            </div>
+
+            <div class="choose-metadata">
+
+                <h5>Wells Chosen: </h5>
+                <h6 id="wells-chosen"></h6>
+                <div class="wrapper">
+                    <p>Enter metadata for wells selected:</p>
+
+                    <textarea id="input_metadata" name="change" cols="20" rows="2"></textarea>
+
+                    <button id="wells_submit" onclick="setCookie(); clear_plate();">Submit</button>
+                    <button id="wells_delete" onclick="delete_data(); clear_plate();">Delete</button>
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+
+        <button id="clear-button" onclick="clear_plate();">Clear Selection</button>
+
+
+        <div class="next-button" id="next-wells"><a href="display.html"  >Next</a></div>
+
+
+
+
+        <script>
+            createplate();
+
+        </script>
+
+    </body>
+
+
+</html>
+
+

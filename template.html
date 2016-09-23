@@ -1,0 +1,282 @@
+<!doctype HTML>
+<html lang="en">
+
+    <head>
+
+        <link href="css/login.css" rel="stylesheet" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <title>SynBis Interface</title>
+
+        <script >
+            /* When the user clicks on the button, 
+             toggle between hiding and showing the dropdown content */
+            $(document).ready(function () {
+
+                $(".dropdown").click(function () {
+                    $("#template-selection").slideToggle();
+                });
+
+
+                $("#template-selection button").focus(function () {
+                    $(".information-tab").slideDown();
+                });
+
+                $("#template-selection button").blur(function () {
+                    $(".information-tab").hide();
+                });
+
+
+                $("#template-selection button").focus(function () {
+                    $(".next-button").show();
+                });
+
+            
+                $(".new-template button").focus(function () {
+                    $(".next-button").show();
+                    $("#template-selection").hide();
+                });
+
+       
+                $("#template_upload").click(function () {
+                    $(".next-button").show();
+                });
+                
+                 $("#template_upload").click(function () {
+                    $(".delete_button").show();
+                });
+                
+                 $(".delete_button").click(function () {
+                    $(".delete_button").hide();
+                });
+                
+                 $(".delete_button").click(function () {
+                    $(".next-button").hide();
+                });
+
+                var user = localStorage.getItem("user_credentials").split(",");
+
+                $("#user-name").html(user[0] + user[1]);
+                $("#user-login").html(user[2]);
+                $("#user-role").html(user[3]);
+
+            });
+
+
+
+
+            function Parse_Mask_File() {
+
+                var file_location = './metadata_testing.csv';
+
+                //  alert(file_location);
+
+                var metadata_header = [];
+                var metadata_value = [];
+
+                d3.csv(file_location, function (d) {
+
+
+
+                    //Note : Use Object.keys(obj) 
+                    // to get a nicer code
+                    // all they keys containing Col etc....
+                    //Advantage :would work for larger number of cols
+
+                    //alert(Object.values(d));
+
+
+                    Object.keys(d).forEach(function (key) {
+
+                        metadata_header.push(key);
+                        metadata_value.push(d[key]);
+                    });
+
+
+                    var output = "";
+
+                    for (var i = 0; i < metadata_header.length; i++) {
+                        if(metadata_value[i]==="free"){
+                          localStorage.setItem("metadata_header_change", metadata_header[i]);
+                          var temp= metadata_header[i];
+                          
+                           $("#change_metadata").html('Change:' +temp);
+                            
+                        }
+                        else{
+                            var heading = '<td>' + metadata_header[i] + '</td>';
+                        }
+                        output = output.concat(heading);
+                   
+                    }
+
+                    $('#myTable').append('<tr>' + output + '</tr>');
+
+                    var output = "";
+
+                    for (var i = 0; i < metadata_value.length; i++) {
+                        if(metadata_value[i]==="free"){
+                          localStorage.setItem("metadata_value_change", metadata_value[i]);
+                            
+                          
+                        }
+                       else{
+                           var value = '<td>' + metadata_value[i] + '</td>';
+                       }
+                        output = output.concat(value);
+                    }
+
+                    $('#myTable').append('<tr>' + output + '</tr>');
+                    
+                    var index=metadata_header.indexOf(temp);
+                    if (index > -1) {
+    metadata_header.splice(index, 1);
+    metadata_value.splice(index, 1);
+}
+
+                    //transpose the table
+
+                    $("#myTable").each(function () {
+                        var $this = $(this);
+                        var newrows = [];
+                        $this.find("tr").each(function () {
+                            var i = 0;
+                            $(this).find("td").each(function () {
+                                i++;
+                                if (newrows[i] === undefined) {
+                                    newrows[i] = $("<tr></tr>");
+                                }
+                                newrows[i].append($(this));
+                            });
+                        });
+                        $this.find("tr").remove();
+                        $.each(newrows, function () {
+                            $this.append(this);
+                        });
+                    });
+
+                    return false;
+
+                }, function (error) {
+
+                    localStorage.setItem("metadata_header", metadata_header);
+                    localStorage.setItem("metadata_value", metadata_value);
+                    // If failure to open file, then the arrays are empty
+                }
+                );
+
+
+
+
+            }
+            
+            function delete_data(){
+                var metadata_header = localStorage.getItem("metadata_header").split(",");
+                var metadata_value = localStorage.getItem("metadata_value").split(",");
+                
+                 for (var i = 0; i < metadata_header.length; i++) {
+                        metadata_header[i]="";
+                        metadata_value[i]="";
+                        $("#myTable").children('tr').remove();
+                    }
+            }
+
+        </script>
+
+    </head>
+
+    <body onload="checkFileAPI();">
+        <div class="header-1">
+            <h1>1. Template Selection</h1>
+            <h2> Begin by choosing your template preference. <br /> Either <em>create a new template </em> to input metadata, or <em>choose an existing template </em> to modify. </h2>
+        </div>
+
+        <div class="user-details">
+            <h4>User Details:</h4>
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td id="user-name"><td>
+                </tr>
+                <tr>
+                    <td>Login:</td>
+                    <td id="user-login"></td>
+                </tr>
+                <tr>
+                    <td>Role:</td>
+                    <td id="user-role"></td>
+                </tr>
+            </table>
+
+        </div>
+
+        <div class="template-block">
+            <div class="new-template">
+                <h4>Import CSV File to New Template</h4> <br />
+                <button onclick="Parse_Mask_File();" id="template_upload">Click</button>
+
+                <p> Create a new completely new template from CSV file </p> <br/>
+
+            </div>
+
+            <h5 id="or"> OR </h5>
+
+
+            <div class="dropdown">
+
+                <h4> Choose Existing Template </h4>
+                <button class="dropbtn">Click to see template</button>
+
+                <p> Choose from a list of existing templates</p> <br /> <br />
+            </div>
+       
+
+            <div id="main">
+                <p id="change_metadata" style="font-size: 18px;"></p>
+                <table >
+                    <tbody id="myTable">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div  class="information-tab">
+                <h3>Information:</h3>
+                <p>Plate reader:<br/>Antibiotic:<br/> etc... </p>
+
+            </div>
+
+            <div id="template-selection" class="dropdown-content">
+                <h3>Choose from Existing User Defined Templates</h3>
+
+                <button>Template 1</button>
+                <button>Template 2</button>
+                <button>Template 3</button>
+                <button>Template 4</button>
+                <button>Template 5</button>
+
+            </div>
+
+            <button class="delete_button" style="display: none;" onclick="delete_data();">Delete</button>
+
+
+            
+            <div id="next" class="next-button ">
+                <form action="platedata.html">
+                      <input type="submit" />
+                </form>
+
+            </div>
+
+
+
+
+        </div>
+
+
+    </body>
+
+

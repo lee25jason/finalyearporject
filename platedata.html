@@ -1,0 +1,68 @@
+<!doctype HTML>
+<html lang="en">
+
+    <head>
+
+        <link href="css/login.css" rel="stylesheet" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <title>SynBis Interface</title>
+
+        <script>
+            $(document).ready(function () {
+                var user = localStorage.getItem("user_credentials").split(",");
+
+                $("#user-name").html(user[0] + user[1]);
+                $("#user-login").html(user[2]);
+                $("#user-role").html(user[3]);
+            });
+
+        </script>
+
+
+
+    </head>
+
+    <body>
+
+
+        <div class="header">
+            <h1>2. Plate Data</h1>
+            <h2> Enter plate specific data </h2>
+        </div>
+
+        <div class="user-details">
+            <h4>User Details:</h4>
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td id="user-name"><td>
+                </tr>
+                <tr>
+                    <td>Login:</td>
+                    <td id="user-login"></td>
+                </tr>
+                <tr>
+                    <td>Role:</td>
+                    <td id="user-role"></td>
+                </tr>
+            </table>
+
+        </div>
+
+        <div class="login-block">
+            <form action="Wellsdata.html">
+
+                <input type="text" placeholder="Plate Number" id="plate-number" required />
+                <h5>Date of Experiment:</h5>
+                <input type="date"  id="surname" required/>
+                <input type="submit">
+
+            </form>
+
+        </div>
+
+
+
+
+    </body>
